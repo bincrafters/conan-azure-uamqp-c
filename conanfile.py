@@ -22,18 +22,21 @@ class AzureUAMQPCConan(ConanFile):
                 .format(self.git_tag, self.source_url)) 
 
     def build(self):
-        tools.replace_in_file("add_subdirectory(add_subdirectory(deps/azure-c-testrunnerswitcher))","")
-        tools.replace_in_file("add_subdirectory(deps/azure-ctest)","")
-        tools.replace_in_file("add_subdirectory(deps/umock-c)","")    
-        tools.replace_in_file("add_subdirectory(deps/azure-c-shared-utility)","")    
-        tools.replace_in_file("include(\"dependencies.cmake\")","")    
-                
-        tools.replace_in_file(
-            "target_link_libraries(uamqp aziotsharedutil)",
-            "target_link_libraries(uamqp $CONAN_LIBS)") 
-           
+        cmake_contents_orig = tools.load(os.path.join(self.lib_short_name,"CMakeLists.txt"))
+        
+        cmake_contents_new = cmake_contents_orig \
+            .replace("add_subdirectory(add_subdirectory(deps/azure-c-testrunnerswitcher))","") \
+            .replace("add_subdirectory(deps/azure-ctest)","") \
+            .replace("add_subdirectory(deps/umock-c)","") \
+            .replace("add_subdirectory(deps/azure-c-shared-utility)","") \
+            .replace("include(\"dependencies.cmake\")","") \
+            .replace("target_link_libraries(uamqp aziotsharedutil)", \
+                        "target_link_libraries(uamqp $CONAN_LIBS)") 
+        
+        tools.save("CMakeLists.txt", cmake_contents_new)
+        
         cmake = CMake(self)
-        cmake.args = ["use_installed_dependencies"]
+        cmake.definitions["use_installed_dependencies"] = "ON"
         cmake.configure(source_dir=self.lib_short_name, build_dir="./")
         cmake.build()
         
