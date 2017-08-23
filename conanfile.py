@@ -1,4 +1,5 @@
-from conans import ConanFile, CMake, os, tools
+from os import path
+from conans import ConanFile, CMake, tools
 
 
 class AzureUAMQPCConan(ConanFile):
