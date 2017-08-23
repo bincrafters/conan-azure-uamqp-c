@@ -8,42 +8,44 @@ class AzureUAMQPCConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
     url = "https://github.com/bincrafters/conan-azure-uamqp-c"
     source_url = "https://github.com/Azure/azure-uamqp-c"
-    git_tag = "2017-08-11"
     description = "AMQP library for C"
     license = "https://github.com/Azure/azure-uamqp-c/blob/master/LICENSE"
-    lib_short_name = "azure-uamqp-c"
-    build_requires = "Azure-CTest/1.1.0@bincrafters/testing", \
-                        "Azure-C-Testrunnerswitcher/1.1.0@bincrafters/testing", \
-                        "uMock-C/1.1.0@bincrafters/testing"
-    requires = "Azure-C-Shared-Utility/1.0.41@bincrafters/testing"
+    requires = "Azure-C-Shared-Utility/1.0.41@bincrafters/stable"
+    options = {"shared": [True, False]}
+    default_options = "shared=True"
+    release_date = "2017-08-11"
+    release_name = "%s-%s" % (name.lower(), release_date)
+    lib_short_name = "uamqp"
     
     def source(self):
-        self.run("git clone --depth=1 --branch={0} {1}.git"
-                .format(self.git_tag, self.source_url)) 
+        tools.get("%s/archive/%s.tar.gz" % (self.source_url, self.release_date))
+
+    def configure(self):
+        if self.settings.os == "Windows" and self.settings.compiler == "Visual Studio":
+            self.options.shared = False
 
     def build(self):
-        cmake_contents_orig = tools.load(os.path.join(self.lib_short_name,"CMakeLists.txt"))
+        conan_magic_lines='''project(%s)
+        include(../conanbuildinfo.cmake)
+        conan_basic_setup()
+        ''' % self.lib_short_name
         
-        cmake_contents_new = cmake_contents_orig \
-            .replace("add_subdirectory(add_subdirectory(deps/azure-c-testrunnerswitcher))","") \
-            .replace("add_subdirectory(deps/azure-ctest)","") \
-            .replace("add_subdirectory(deps/umock-c)","") \
-            .replace("add_subdirectory(deps/azure-c-shared-utility)","") \
-            .replace("include(\"dependencies.cmake\")","") \
-            .replace("target_link_libraries(uamqp aziotsharedutil)", \
-                        "target_link_libraries(uamqp $CONAN_LIBS)") 
-        
-        tools.save("CMakeLists.txt", cmake_contents_new)
-        
+        tools.replace_in_file("%s/CMakeLists.txt" % self.release_name, "project(%s)" % self.lib_short_name, conan_magic_lines)
         cmake = CMake(self)
-        cmake.definitions["use_installed_dependencies"] = "ON"
-        cmake.configure(source_dir=self.lib_short_name, build_dir="./")
+        cmake.definitions["skip_samples"] = True
+        cmake.definitions["use_installed_dependencies"] = True
+        cmake.definitions["azure_c_shared_utility_DIR"] = self.deps_cpp_info["Azure-C-Shared-Utility"].res_paths[0]
+        cmake.configure(source_dir=self.release_name)
         cmake.build()
-        
+
     def package(self):
-        self.copy(pattern="*", dst="include", src="include")		
-        self.copy(pattern="*", dst="lib", src="lib")
+        self.copy(pattern="LICENSE", dst=".", src=".")
+        self.copy(pattern="*", dst="include", src=path.join(self.release_name, "inc"))
+        self.copy(pattern="*.lib", dst="lib", src="lib")
+        self.copy(pattern="*.dll", dst="bin", src=".")
+        self.copy(pattern="*.a", dst="lib", src="lib")
+        self.copy(pattern="*.so*", dst="lib", src=".")
+        self.copy(pattern="*.dylib", dst="bin", src=".")
 
     def package_info(self):
         self.cpp_info.libs = self.collect_libs()
-
