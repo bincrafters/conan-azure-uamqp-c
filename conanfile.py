@@ -46,7 +46,7 @@ class AzureUAMQPCConan(ConanFile):
         self.copy(pattern="*.dll", dst="bin", src=".")
         self.copy(pattern="*.a", dst="lib", src="lib")
         self.copy(pattern="*.so*", dst="lib", src=".")
-        self.copy(pattern="*.dylib", dst="bin", src=".")
+        self.copy(pattern="*.dylib", dst="lib", src=".")
 
     def package_info(self):
         self.cpp_info.libs = self.collect_libs()
