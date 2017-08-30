@@ -31,11 +31,9 @@ if(WIN32)
 	add_definitions(-DGB_MEASURE_MEMORY_FOR_THIS -DGB_DEBUG_ALLOC)
 
 if(WINCE)
-	target_link_libraries(local_client_sample
-		uamqp aziotsharedutil secur32)
+	target_link_libraries(local_client_sample ${CONAN_LIBS} secur32)
 else()
-	target_link_libraries(local_client_sample
-		uamqp aziotsharedutil ws2_32 secur32)
+	target_link_libraries(local_client_sample ${CONAN_LIBS} ws2_32 secur32)
 endif()
 
 	if(${use_openssl})
@@ -49,5 +47,5 @@ endif()
 		target_link_libraries(local_client_sample $ENV{WolfSSLDir}/Debug/wolfssl.lib)
 	endif()
 else()
-	target_link_libraries(local_client_sample uamqp aziotsharedutil)
+	target_link_libraries(local_client_sample ${CONAN_LIBS})
 endif()
