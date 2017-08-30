@@ -20,7 +20,7 @@ class AzureuamqpcTestConan(ConanFile):
 
     def test(self):
         os.chdir("bin")
-        app_name = "amqp_client_sample"
+        app_name = "local_client_sample"
         if platform.system() == "Windows":
             app_name += ".exe"
         assert(os.path.isfile(app_name))
