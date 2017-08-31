@@ -19,10 +19,13 @@ class AzureuamqpcTestConan(ConanFile):
     def imports(self):
         self.copy("*.dll", dst="bin", src="bin")
         self.copy("*.dylib*", dst="bin", src="lib")
+        self.copy("*.so*", dst="bin", src="lib")
+        self.copy("*.cmake", dst="res", src="res")
 
     def test(self):
         app_name = "local_client_sample"
         if platform.system() == "Windows":
             app_name += ".exe"
+        assert(os.path.isfile(os.path.join("res", "uamqpConfig.cmake")))
         assert(os.path.isfile(os.path.join("bin", app_name)))
         subprocess.check_call(os.path.join("bin", app_name))
