@@ -5,7 +5,7 @@ from conans import ConanFile, CMake, tools
 class AzureUAMQPCConan(ConanFile):
     name = "Azure-uAMQP-C"
     version = "1.0.41"
-    generators = "cmake" 
+    generators = "cmake"
     settings = "os", "arch", "compiler", "build_type"
     url = "https://github.com/bincrafters/conan-azure-uamqp-c"
     source_url = "https://github.com/Azure/azure-uamqp-c"
@@ -17,7 +17,7 @@ class AzureUAMQPCConan(ConanFile):
     release_date = "2017-08-11"
     release_name = "%s-%s" % (name.lower(), release_date)
     lib_short_name = "uamqp"
-    
+
     def source(self):
         tools.get("%s/archive/%s.tar.gz" % (self.source_url, self.release_date))
 
@@ -30,7 +30,7 @@ class AzureUAMQPCConan(ConanFile):
         include(../conanbuildinfo.cmake)
         conan_basic_setup()
         ''' % self.lib_short_name
-        
+
         tools.replace_in_file("%s/CMakeLists.txt" % self.release_name, "project(%s)" % self.lib_short_name, conan_magic_lines)
         cmake = CMake(self)
         cmake.definitions["skip_samples"] = True
@@ -46,7 +46,7 @@ class AzureUAMQPCConan(ConanFile):
         self.copy(pattern="*.dll", dst="bin", src=".")
         self.copy(pattern="*.a", dst="lib", src="lib")
         self.copy(pattern="*.so*", dst="lib", src=".")
-        self.copy(pattern="*.dylib", dst="bin", src=".")
+        self.copy(pattern="*.dylib", dst="lib", src=".")
 
     def package_info(self):
         self.cpp_info.libs = self.collect_libs()
