@@ -43,6 +43,7 @@ class AzureUAMQPCConan(ConanFile):
         self.copy(pattern="LICENSE", dst=".", src=".")
         self.copy(pattern="*", dst="include", src=path.join(self.release_name, "inc"))
         self.copy(pattern="uamqpConfig.cmake", dst="res", src=path.join(self.release_name, "configs"))
+        self.copy(pattern="*.cmake", dst="res", src=path.join("CMakeFiles", "Export", "cmake"))
         self.copy(pattern="*.lib", dst="lib", src="lib")
         self.copy(pattern="*.dll", dst="bin", src=".")
         self.copy(pattern="*.a", dst="lib", src="lib")
