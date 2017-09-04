@@ -47,4 +47,4 @@ This is a header only library, so nothing needs to be built.
     $ conan upload Azure-uAMQP-C/1.0.41@bincrafters/testing --all -r bincrafters
 
 ### License
-[Boost](LICENSE)
+[MIT](LICENSE)
