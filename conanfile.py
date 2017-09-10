@@ -11,7 +11,7 @@ class AzureUAMQPCConan(ConanFile):
     source_url = "https://github.com/Azure/azure-uamqp-c"
     description = "AMQP library for C"
     license = "https://github.com/Azure/azure-uamqp-c/blob/master/LICENSE"
-    requires = "Azure-C-Shared-Utility/1.0.41@bincrafters/stable"
+    requires = "Azure-C-Shared-Utility/1.0.41@bincrafters/testing"
     options = {"shared": [True, False]}
     default_options = "shared=True"
     release_date = "2017-08-11"
@@ -31,7 +31,10 @@ class AzureUAMQPCConan(ConanFile):
         conan_basic_setup()
         ''' % self.lib_short_name
 
-        tools.replace_in_file("%s/CMakeLists.txt" % self.release_name, "project(%s)" % self.lib_short_name, conan_magic_lines)
+        cmake_file = "%s/CMakeLists.txt" % self.release_name
+        tools.replace_in_file(cmake_file, "project(%s)" % self.lib_short_name, conan_magic_lines)
+        content = tools.load(cmake_file)
+        tools.save(cmake_file, content[0:content.find("if(${use_installed_dependencies})")])
         cmake = CMake(self)
         cmake.definitions["skip_samples"] = True
         cmake.definitions["use_installed_dependencies"] = True

@@ -8,14 +8,14 @@ The packages generated with this **conanfile** can be found in [Bintray](https:/
 
 ### Basic setup
 
-    $ conan install Azure-uAMQP-C/1.0.41@bincrafters/testing
+    $ conan install Azure-uAMQP-C/1.0.41@bincrafters/stable
 
 ### Project setup
 
 If you handle multiple dependencies in your project is better to add a *conanfile.txt*
 
     [requires]
-    Azure-uAMQP-C/1.0.41@bincrafters/testing
+    Azure-uAMQP-C/1.0.41@bincrafters/stable
 
     [generators]
     txt
@@ -36,7 +36,7 @@ This is a header only library, so nothing needs to be built.
 
 ## Package 
 
-    $ conan create bincrafters/testing
+    $ conan create bincrafters/stable
 	
 ## Add Remote
 
@@ -44,7 +44,7 @@ This is a header only library, so nothing needs to be built.
 
 ## Upload
 
-    $ conan upload Azure-uAMQP-C/1.0.41@bincrafters/testing --all -r bincrafters
+    $ conan upload Azure-uAMQP-C/1.0.41@bincrafters/stable --all -r bincrafters
 
 ### License
 [MIT](LICENSE)
