@@ -22,7 +22,7 @@ compileAsC99()
 
 file(GLOB SOURCE_FILES *.c)
 
-add_executable(local_client_sample ${SOURCE_FILES})
+add_executable(test_package ${SOURCE_FILES})
 
 include_directories(.)
 if(WIN32)
@@ -31,21 +31,21 @@ if(WIN32)
 	add_definitions(-DGB_MEASURE_MEMORY_FOR_THIS -DGB_DEBUG_ALLOC)
 
 if(WINCE)
-	target_link_libraries(local_client_sample ${CONAN_LIBS} secur32)
+	target_link_libraries(test_package ${CONAN_LIBS} secur32)
 else()
-	target_link_libraries(local_client_sample ${CONAN_LIBS} ws2_32 secur32)
+	target_link_libraries(test_package ${CONAN_LIBS} ws2_32 secur32)
 endif()
 
 	if(${use_openssl})
-		target_link_libraries(local_client_sample
+		target_link_libraries(test_package
 			$ENV{OpenSSLDir}/lib/ssleay32.lib $ENV{OpenSSLDir}/lib/libeay32.lib)
 
 		file(COPY $ENV{OpenSSLDir}/bin/libeay32.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
 		file(COPY $ENV{OpenSSLDir}/bin/ssleay32.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
 	endif()
 	if(${use_wolfssl})
-		target_link_libraries(local_client_sample $ENV{WolfSSLDir}/Debug/wolfssl.lib)
+		target_link_libraries(test_package $ENV{WolfSSLDir}/Debug/wolfssl.lib)
 	endif()
 else()
-	target_link_libraries(local_client_sample ${CONAN_LIBS})
+	target_link_libraries(test_package ${CONAN_LIBS})
 endif()
