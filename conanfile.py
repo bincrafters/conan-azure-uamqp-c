@@ -4,7 +4,7 @@ from conans import ConanFile, CMake, tools
 
 class AzureUAMQPCConan(ConanFile):
     name = "Azure-uAMQP-C"
-    version = "1.0.41"
+    version = "1.0.43"
     generators = "cmake"
     settings = "os", "arch", "compiler", "build_type"
     url = "https://github.com/bincrafters/conan-azure-uamqp-c"
@@ -13,9 +13,9 @@ class AzureUAMQPCConan(ConanFile):
     options = {"shared": [True, False]}
     default_options = "shared=True"
     lib_short_name = "uamqp"
-    release_date = "2017-08-11"
+    release_date = "2017-09-08"
     release_name = "%s-%s" % (name.lower(), release_date)
-    requires = "Azure-C-Shared-Utility/1.0.41@bincrafters/testing"
+    requires = "Azure-C-Shared-Utility/1.0.43@bincrafters/testing"
 
     def source(self):
         tools.get("%s/archive/%s.tar.gz" % (self.source_url, self.release_date))
