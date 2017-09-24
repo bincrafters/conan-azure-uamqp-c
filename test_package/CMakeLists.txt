@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.8.11)
 project(test-uamqp)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup(SKIP_RPATH)
+conan_basic_setup()
 
 macro(compileAsC99)
   if (CMAKE_VERSION VERSION_LESS "3.1")
