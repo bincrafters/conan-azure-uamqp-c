@@ -8,22 +8,25 @@ class AzureUAMQPCConan(ConanFile):
     generators = "cmake"
     settings = "os", "arch", "compiler", "build_type"
     url = "https://github.com/bincrafters/conan-azure-uamqp-c"
-    source_url = "https://github.com/Azure/azure-uamqp-c"
     description = "AMQP library for C"
     license = "https://github.com/Azure/azure-uamqp-c/blob/master/LICENSE"
-    requires = "Azure-C-Shared-Utility/1.0.41@bincrafters/testing"
     options = {"shared": [True, False]}
     default_options = "shared=True"
+    lib_short_name = "uamqp"
     release_date = "2017-08-11"
     release_name = "%s-%s" % (name.lower(), release_date)
-    lib_short_name = "uamqp"
+    requires = "Azure-C-Shared-Utility/1.0.41@bincrafters/testing"
 
     def source(self):
         tools.get("%s/archive/%s.tar.gz" % (self.source_url, self.release_date))
 
     def configure(self):
+        # TODO: static library fails on Linux
         if self.settings.os == "Windows" and self.settings.compiler == "Visual Studio":
             self.options.shared = False
+
+        if self.settings.os == "Linux":
+            self.options.shared = True
 
     def build(self):
         conan_magic_lines='''project(%s)
