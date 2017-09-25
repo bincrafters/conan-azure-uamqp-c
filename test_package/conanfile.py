@@ -1,4 +1,4 @@
-from conans import ConanFile, CMake, tools
+from conans import ConanFile, CMake
 import os
 
 
@@ -10,9 +10,6 @@ class TestPackageConan(ConanFile):
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
-        
-    def imports(self):
-        self.copy("*", dst="bin", src="lib")
         
     def imports(self):
         self.copy("*.dll", dst="bin", src="bin")
