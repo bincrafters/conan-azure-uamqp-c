@@ -21,4 +21,8 @@ class TestPackageConan(ConanFile):
         self.copy("*.cmake", dst="res", src="res")
         
     def test(self):
-        self.run(os.path.join("bin","test_package"))
+        try:
+            self.run("ulimit -c unlimited")
+            self.run("./test_package")
+        except:
+            self.run('gdb --batch --quiet -ex "thread apply all bt full" -ex "quit" test_package  core')
