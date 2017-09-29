@@ -42,7 +42,10 @@ class AzureUAMQPCConan(ConanFile):
         cmake = CMake(self)
         cmake.definitions["skip_samples"] = True
         cmake.definitions["use_installed_dependencies"] = True
-        cmake.definitions["azure_c_shared_utility_DIR"] = self.deps_cpp_info["Azure-C-Shared-Utility"].res_paths[0]
+        if self.deps_cpp_info["Azure-C-Shared-Utility"].resdirs:
+            resdir = self.deps_cpp_info["Azure-C-Shared-Utility"].resdirs[0]
+            resdir = path.join(self.deps_cpp_info["Azure-C-Shared-Utility"].rootpath, resdir)
+            cmake.definitions["azure_c_shared_utility_DIR"] = resdir
         cmake.configure(source_dir=self.release_name)
         cmake.build()
 
