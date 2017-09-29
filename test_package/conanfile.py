@@ -1,6 +1,6 @@
 from conans import ConanFile, CMake, tools
 import os
-
+import time
 
 class TestPackageConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
@@ -21,4 +21,10 @@ class TestPackageConan(ConanFile):
         self.copy("*.cmake", dst="res", src="res")
         
     def test(self):
-        self.run(os.path.join("bin","test_package"))
+        os.chdir("bin")
+        try:
+            self.run("LD_PRELOAD=/usr/lib/debug/lib/x86_64-linux-gnu/libSegFault.so && ./test_package")
+        except:
+            time.sleep(3)
+            self.run("ls -lah")
+            self.run('gdb --batch --quiet -ex "thread apply all bt full" -ex "quit" test_package  core')
