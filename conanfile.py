@@ -29,12 +29,14 @@ class AzureUAMQPCConan(ConanFile):
 
         cmake_file = "%s/CMakeLists.txt" % self.release_name
         tools.replace_in_file(cmake_file, "project(%s)" % self.lib_short_name, conan_magic_lines)
+        conan_magic_lines = "include(%s/deps/c-utility/configs/azure_iot_build_rules.cmake)" % self.deps_cpp_info["Azure-C-Shared-Utility"].res_paths[0]
+        tools.replace_in_file(cmake_file, "include(deps/azure-c-shared-utility/configs/azure_iot_build_rules.cmake)", conan_magic_lines)
         content = tools.load(cmake_file)
         tools.save(cmake_file, content[0:content.find("if(${use_installed_dependencies})")])
         cmake = CMake(self)
         cmake.definitions["skip_samples"] = True
         cmake.definitions["use_installed_dependencies"] = True
-        cmake.definitions["azure_c_shared_utility_DIR"] = self.deps_cpp_info["Azure-C-Shared-Utility"].res_paths[0]
+        cmake.definitions["azure_c_shared_utility_DIR"] = path.join(self.deps_cpp_info["Azure-C-Shared-Utility"].res_paths[0], "deps", "c-utility", "configs")
         cmake.configure(source_dir=self.release_name)
         cmake.build()
 
