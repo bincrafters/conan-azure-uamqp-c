@@ -11,7 +11,7 @@ class AzureUAMQPCConan(ConanFile):
     description = "AMQP library for C"
     license = "https://github.com/Azure/azure-uamqp-c/blob/master/LICENSE"
     options = {"shared": [True, False]}
-    default_options = "shared=False"
+    default_options = "shared=True"
     lib_short_name = "uamqp"
     release_date = "2017-10-20"
     release_name = "%s-%s" % (name.lower(), release_date)
