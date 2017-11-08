@@ -21,22 +21,34 @@ class AzureUAMQPCConan(ConanFile):
         source_url = "https://github.com/Azure/azure-uamqp-c"
         tools.get("%s/archive/%s.tar.gz" % (source_url, self.release_date))
 
+    def configure(self):
+        del self.settings.compiler.libcxx
+
     def build(self):
         conan_magic_lines='''project(%s)
         include(../conanbuildinfo.cmake)
         conan_basic_setup()
         ''' % self.lib_short_name
-
         cmake_file = "%s/CMakeLists.txt" % self.release_name
+        res_paths = self.deps_cpp_info["Azure-C-Shared-Utility"].res_paths[0]
+        if self.settings.os == "Windows":
+            res_paths = res_paths.replace("\\", "/")
         tools.replace_in_file(cmake_file, "project(%s)" % self.lib_short_name, conan_magic_lines)
-        conan_magic_lines = "include(%s/deps/c-utility/configs/azure_iot_build_rules.cmake)" % self.deps_cpp_info["Azure-C-Shared-Utility"].res_paths[0]
+        conan_magic_lines = "include(%s/deps/c-utility/configs/azure_iot_build_rules.cmake)" % res_paths
         tools.replace_in_file(cmake_file, "include(deps/azure-c-shared-utility/configs/azure_iot_build_rules.cmake)", conan_magic_lines)
         content = tools.load(cmake_file)
         tools.save(cmake_file, content[0:content.find("if(${use_installed_dependencies})")])
+        conan_magic_lines = '''    find_package(azure_c_shared_utility REQUIRED CONFIG
+        HINTS %s/deps/c-utility/configs/)''' % res_paths
+        tools.replace_in_file("%s/dependencies.cmake" % self.release_name, "    find_package(azure_c_shared_utility REQUIRED config)", conan_magic_lines)
+        if self.settings.os == "Windows":
+            conan_magic_lines = "target_link_libraries(uamqp aziotsharedutil ws2_32 secur32)"
+            tools.replace_in_file(cmake_file, "target_link_libraries(uamqp aziotsharedutil)", conan_magic_lines)
         cmake = CMake(self)
         cmake.definitions["skip_samples"] = True
         cmake.definitions["use_installed_dependencies"] = True
-        cmake.definitions["azure_c_shared_utility_DIR"] = path.join(self.deps_cpp_info["Azure-C-Shared-Utility"].res_paths[0], "deps", "c-utility", "configs")
+        if self.settings.os == "Windows" and self.options.shared:
+            cmake.definitions["CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS"] = True
         cmake.configure(source_dir=self.release_name)
         cmake.build()
 
@@ -45,13 +57,15 @@ class AzureUAMQPCConan(ConanFile):
         self.copy(pattern="*", dst="include", src=path.join(self.release_name, "inc"))
         self.copy(pattern="uamqpConfig.cmake", dst="res", src=path.join(self.release_name, "configs"))
         self.copy(pattern="*.cmake", dst="res", src=path.join("CMakeFiles", "Export", "cmake"))
-        self.copy(pattern="*.lib", dst="lib", src="lib")
-        self.copy(pattern="*.dll", dst="bin", src=".")
-        self.copy(pattern="*.a", dst="lib", src="lib")
-        self.copy(pattern="*.so*", dst="lib", src=".")
-        self.copy(pattern="*.dylib", dst="lib", src=".")
+        self.copy(pattern="*.lib", dst="lib", src="lib", keep_path=False)
+        self.copy(pattern="*.dll", dst="bin", src=".", keep_path=False)
+        self.copy(pattern="*.a", dst="lib", src="lib", keep_path=False)
+        self.copy(pattern="*.so*", dst="lib", src=".", keep_path=False)
+        self.copy(pattern="*.dylib", dst="lib", src=".", keep_path=False)
 
     def package_info(self):
         self.cpp_info.libs = tools.collect_libs(self)
         if self.settings.os == "Linux":
             self.cpp_info.libs.append("pthread")
+        elif self.settings.os == "Windows":
+            self.cpp_info.libs.append("Ws2_32")
